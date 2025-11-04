@@ -18,6 +18,8 @@ struct Nodo {
   };
 };
 
+int index = 0;
+
 void insertarNuevoProceso(Nodo *&inicio) {
   string nombre;
   int Id;
@@ -25,11 +27,9 @@ void insertarNuevoProceso(Nodo *&inicio) {
   bool estado;
   cout << "Ingrese el nombre del proceso: ";
   cin >> nombre;
-  cout << "Ingrese el id del proceso: ";
-  cin >> Id;
-  cout << "Ingrese la prioridad del proceso: ";
+  cout << "Ingrese la prioridad del proceso: (0: prioridad baja; 1: prioridad intermedia; 2: prioridad maxima): ";
   cin >> prioridad;
-  cout << "Ingrese el estado del proceso: ";
+  cout << "Ingrese el estado del proceso: (0: en espera; 1: en ejecucion): ";
   cin >> estado;
   cout << "Proceso " << nombre << " añadido" << endl;
   cout << "-------------------------------------" << endl;
@@ -38,7 +38,7 @@ void insertarNuevoProceso(Nodo *&inicio) {
   cout << "Prioridad: " << prioridad << endl;
   cout << "Estado: " << estado << endl;
 
-  Proceso proceso = {nombre, Id, prioridad, estado};
+  Proceso proceso = {nombre, index, prioridad, estado};
 
   Nodo *nuevoNodo = new Nodo(proceso);
   if (inicio == NULL) {
@@ -50,6 +50,7 @@ void insertarNuevoProceso(Nodo *&inicio) {
     }
     temp->siguiente = nuevoNodo;
   }
+  index++;
 };
 
 int buscarProcesoPorId(Nodo *inicio, int idProceso) {
@@ -174,16 +175,36 @@ void modificarPrioridadProceso(Nodo *inicio, int nuevaPrioridad) {
   };
 };
 
+void mostrarProcesos(Nodo* inicio){
+	Nodo* temp = inicio;
+	if (inicio == NULL){
+		cout << "No hay procesos" << endl;
+		return;
+	}
+	cout <<"Procesos: ------------------------------------------------------------";
+	while (temp != NULL){
+		cout << "==================================================";
+		cout << "Nombre: " <<temp->proceso.nombre << endl;
+				cout << "ID: "<<temp->proceso.Id << endl;
+						cout << "Prioridad: "<<temp->proceso.prioridad << endl;
+												cout <<"Estado: "<< temp->proceso.estado << endl;
+				cout << "==================================================";
+		temp = temp->siguiente;
+	}
+	
+}
+
 int main() {
   int op;
   Nodo *listaDeProcesos = NULL;
 
   do {
     cout << "-----Administrador de archivos----- " << endl;
-    cout << "1. Añadir nuevo proceso";
-    cout << "2. Eliminar proceso";
-    cout << "3. Buscar proceso";
-    cout << "4. Modificar prioridad de proceso";
+    cout << "1. Añadir nuevo proceso"<< endl;
+    cout << "2. Eliminar proceso"<< endl;
+    cout << "3. Buscar proceso"<< endl;
+    cout << "4. Modificar prioridad de proceso"<< endl;
+        cout << "5. Salir"<< endl;
     cin >> op;
 
     switch (op) {
@@ -199,9 +220,10 @@ int main() {
     case 4:
       modificarPrioridadProceso(listaDeProcesos, 1);
       break;
+    case 5: cout << "Saliendo..."; break;
     default:
       cout << "Opcion invalida" << endl;
       break;
     }
-  } while (op != 4);
+  } while (op != 5);
 };
