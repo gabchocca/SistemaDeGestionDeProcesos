@@ -3,7 +3,7 @@
 using namespace std;
 
 struct Proceso {
-  string nombre;
+  string nombre;   //Proceso
   int Id;
   int prioridad;
   bool estado;
@@ -31,7 +31,7 @@ void insertarNuevoProceso(Nodo *&inicio) {
   cin >> prioridad;
   cout << "Ingrese el estado del proceso: (0: en espera; 1: en ejecucion): ";
   cin >> estado;
-  cout << "Proceso " << nombre << " añadido" << endl;
+  cout << "Proceso " << nombre << " aÃ±adido" << endl;
   cout << "-------------------------------------" << endl;
   cout << "Nombre: " << nombre << endl;
   cout << "Id: " << Id << endl;
@@ -200,7 +200,7 @@ int main() {
 
   do {
     cout << "-----Administrador de archivos----- " << endl;
-    cout << "1. Añadir nuevo proceso"<< endl;
+    cout << "1. AÃ±adir nuevo proceso"<< endl;
     cout << "2. Eliminar proceso"<< endl;
     cout << "3. Buscar proceso"<< endl;
     cout << "4. Modificar prioridad de proceso"<< endl;
