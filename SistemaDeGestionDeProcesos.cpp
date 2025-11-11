@@ -2,206 +2,509 @@
 #include <string>
 using namespace std;
 
-struct Proceso {
+int ID = 0;
+struct Tarea {
+  int id = ID;
   string nombre;
-  int Id;
-  int prioridad;
-  bool estado;
+  string prioridad;
 };
 
-struct Nodo {
-  Proceso proceso;
-  Nodo *siguiente;
-  Nodo(Proceso p) {
-    proceso = p;
+struct NodoCola {
+  Tarea tarea;
+  NodoCola *siguiente;
+  NodoCola(Tarea t) {
+    tarea = t;
+    siguiente = NULL;
+  }
+};
+
+struct NodoLista {
+  Tarea tarea;
+  NodoLista *siguiente;
+  NodoLista(Tarea t) {
+    tarea = t;
     siguiente = NULL;
   };
 };
 
-void insertarNuevoProceso(Nodo *&inicio) {
-  string nombre;
-  int Id;
-  int prioridad;
-  bool estado;
-  cout << "Ingrese el nombre del proceso: ";
-  cin >> nombre;
-  cout << "Ingrese el id del proceso: ";
-  cin >> Id;
-  cout << "Ingrese la prioridad del proceso: ";
-  cin >> prioridad;
-  cout << "Ingrese el estado del proceso: ";
-  cin >> estado;
-  cout << "Proceso " << nombre << " añadido" << endl;
-  cout << "-------------------------------------" << endl;
-  cout << "Nombre: " << nombre << endl;
-  cout << "Id: " << Id << endl;
-  cout << "Prioridad: " << prioridad << endl;
-  cout << "Estado: " << estado << endl;
+struct NodoTareaAsignada {
+  Tarea tarea;
+  NodoTareaAsignada *siguiente;
+  NodoTareaAsignada(Tarea t) {
+    tarea = t;
+    siguiente = NULL;
+  };
+};
 
-  Proceso proceso = {nombre, Id, prioridad, estado};
-
-  Nodo *nuevoNodo = new Nodo(proceso);
-  if (inicio == NULL) {
-    inicio = nuevoNodo;
-  } else {
-    Nodo *temp = inicio;
-    while (temp->siguiente != NULL) {
-      temp = temp->siguiente;
-    }
-    temp->siguiente = nuevoNodo;
+struct NodoPila {
+  Tarea tarea;
+  NodoPila *siguiente;
+  NodoPila(Tarea t) {
+    tarea = t;
+    siguiente = NULL;
   }
 };
 
-int buscarProcesoPorId(Nodo *inicio, int idProceso) {
-  Nodo *temp = inicio;
-  int pocision = 0;
-  while (temp != NULL) {
-    if (temp->proceso.Id == idProceso) {
-      return pocision;
-    };
-    temp = temp->siguiente;
-    pocision++;
-  };
-  return -1;
-};
+NodoTareaAsignada *tareasAsignadas = NULL;
+string textoTareasCompletadas = "=====================================\n";
 
-int buscarProcesoPorNombre(Nodo *inicio, string nombreProceso) {
+// LISTAS  ------------------------------------------------------------
+string Prioridades[3] = {"baja", "media", "alta"};
 
-  Nodo *temp = inicio;
-  int pocision = 0;
-  while (temp != NULL) {
-    if (temp->proceso.nombre == nombreProceso) {
-      return pocision;
-    };
-    temp = temp->siguiente;
-    pocision++;
-  };
-  return -1;
-};
+void insertarNuevaTarea(NodoLista *inicio) {
+  string nombre;
+  string prioridad;
+  cout << "Ingrese el nombre de la nueva tarea: ";
+  cin >> nombre;
+  do {
+    cout << "Ingrese la prioridad de la nueva tarea: (baja, media o alta) ";
+    cin >> prioridad;
+  } while (prioridad != "baja" && prioridad != "media" && prioridad != "alta");
+  cout << "Tarea " << nombre << " añadida" << endl;
+  cout << "-------------------------------------" << endl;
+  cout << "Id: " << ID << endl;
+  cout << "Nombre: " << nombre << endl;
+  cout << "Prioridad: " << prioridad << endl;
 
-void buscarProceso(Nodo *inicio) {
-  int opcion, idProceso;
-  cout << "Desea buscar por id o por nombre?";
-  cout << "1. Id";
-  cout << "2. Nombre";
-  cin >> opcion;
+  Tarea nuevaTarea = Tarea();
+  nuevaTarea.nombre = nombre;
+  nuevaTarea.prioridad = prioridad;
 
-  switch (opcion) {
-  case 1: {
-
-    cout << "Ingrese el id del proceso a buscar: ";
-    cin >> idProceso;
-    int pocision = buscarProcesoPorId(inicio, idProceso);
-    cout << "El proceso se encuentra en la pocision: " << pocision;
-    if (pocision == -1) {
-      cout << "Ese Proceso No Existe" << endl;
-    };
-    break;
-  };
-  case 2: {
-    string nombreProceso;
-    cout << "Ingrese el nombre del proceso a buscar: ";
-    cin >> nombreProceso;
-    int pocision = buscarProcesoPorNombre(inicio, nombreProceso);
-    cout << "El proceso se encuentra en la pocision: " << pocision;
-    if (pocision == -1) {
-      cout << "Ese Proceso No Existe" << endl;
-    };
-    break;
-  };
-
-  default: {
-    cout << "Opcion invalida" << endl;
-    int idABuscar = buscarProcesoPorId(inicio, idProceso);
-  };
-  };
-};
-
-void eliminarProceso(Nodo *&inicio) {
-  int idProceso;
-  cout << "Ingrese el id del proceso a buscar: ";
-  cin >> idProceso;
-  int pocision = buscarProcesoPorId(inicio, idProceso);
-  if (pocision == -1) {
-    cout << "Ese Proceso No Existe" << endl;
-    return;
-  };
-
+  NodoLista *nuevoNodoLista = new NodoLista(nuevaTarea);
   if (inicio == NULL) {
-    cout << "No hay procesos en la lista" << endl;
-    return;
-  };
-  if (inicio->proceso.Id == idProceso) {
-    Nodo *temp = inicio;
-    inicio = inicio->siguiente;
-    delete temp;
-    cout << "Proceso eliminado" << endl;
-    return;
-  };
-
-  Nodo *anterior = inicio;
-  Nodo *actual = inicio->siguiente;
-  while (actual != NULL && actual->proceso.Id != idProceso) {
-    anterior = actual;
-    actual = actual->siguiente;
-  };
-  if (actual == NULL) {
-    cout << "Proceso no encontrado" << endl;
+    inicio = nuevoNodoLista;
   } else {
-    anterior->siguiente = actual->siguiente;
-    delete actual;
-    cout << "Proceso eliminado" << endl;
-  };
-};
-
-void modificarPrioridadProceso(Nodo *inicio, int nuevaPrioridad) {
-
-  int idProceso;
-  cout << "Ingrese el id del proceso a buscar: ";
-  cin >> idProceso;
-
-  Nodo *temp = inicio;
-  int pocision = buscarProcesoPorId(inicio, idProceso);
-  if (pocision == -1) {
-    cout << "Ese Proceso No Existe" << endl;
-  } else {
-    for (int i = 0; i < pocision; i++) {
+    NodoLista *temp = inicio;
+    while (temp->siguiente != NULL) {
       temp = temp->siguiente;
     }
-    temp->proceso.prioridad = nuevaPrioridad;
-    cout << "Prioridad del proceso " << temp->proceso.nombre << " modificada a"
-         << temp->proceso.prioridad << endl;
+    temp->siguiente = nuevoNodoLista;
+  }
+
+  ID++;
+};
+
+void buscarTarea(NodoLista *inicio, string modo = "id") {
+  if (modo == "id") {
+    int id;
+    do {
+      cout << "Ingrese el id de la tarea a buscar: ";
+      cin >> id;
+    } while (id < 0);
+    NodoLista *temp = inicio;
+    while (temp->siguiente != NULL) {
+      if (temp->tarea.id == id) {
+        cout << "Tarea encontrada" << endl;
+        cout << "Id: " << temp->tarea.id << endl;
+        cout << "Nombre: " << temp->tarea.nombre << endl;
+        cout << "Prioridad: " << temp->tarea.prioridad << endl;
+        return;
+      } else
+        temp = temp->siguiente;
+    };
+    cout << "Tarea no encontrada";
+
+  } else if (modo == "prioridad") {
+    string prioridad;
+    do {
+      cout << "Ingrese la prioridad de la tarea a buscar: ";
+      cin >> prioridad;
+    } while (prioridad != "baja" && prioridad != "media" &&
+             prioridad != "alta");
+
+    NodoLista *temp = inicio;
+    while (temp->siguiente != NULL) {
+      if (temp->tarea.prioridad == prioridad) {
+        cout << "Tarea encontrada" << endl;
+        cout << "Id: " << temp->tarea.id << endl;
+        cout << "Nombre: " << temp->tarea.nombre << endl;
+        cout << "Prioridad: " << temp->tarea.prioridad << endl;
+        return;
+      } else
+        temp = temp->siguiente;
+    };
+
+    cout << "Tarea no encontrada";
+
+  } else
+    cout << "ERROR: Modo de busqueda invalido";
+};
+
+// ORDENAMIENTO DE LA LISTA
+int valorDePrioridad(string &p) {
+  if (p == "alta")
+    return 3;
+  if (p == "media")
+    return 2;
+  if (p == "baja")
+    return 1;
+}
+void ordenarTareasPrioritarias(NodoLista *inicio) {
+  if (inicio == NULL || inicio->siguiente == NULL)
+    return;
+
+  bool cambiado;
+  do {
+    cambiado = false;
+    NodoLista **ptr = &inicio; // puntero doble al nodo actual
+
+    while ((*ptr)->siguiente != NULL) {
+      NodoLista *actual = *ptr;
+      NodoLista *siguiente = actual->siguiente;
+
+      if (valorDePrioridad(actual->tarea.prioridad) <
+          valorDePrioridad(siguiente->tarea.prioridad)) {
+
+        // Intercambiar punteros
+        actual->siguiente = siguiente->siguiente;
+        siguiente->siguiente = actual;
+        *ptr = siguiente;
+        cambiado = true;
+      }
+      ptr = &((*ptr)->siguiente);
+    }
+  } while (cambiado);
+}
+
+void mostrarTareas(NodoLista *inicio) {
+  NodoLista *temp = inicio;
+  cout << "====Tareas en la lista====" << endl;
+  while (temp != NULL) {
+    cout << "=========================================" << endl;
+    cout << "Id: " << temp->tarea.id << endl;
+    cout << "Nombre: " << temp->tarea.nombre << endl;
+    cout << "Prioridad: " << temp->tarea.prioridad << endl;
+    cout << "=========================================" << endl;
+    temp = temp->siguiente;
+  }
+}
+// COLA----------------------------------------------------------------
+void encolar(NodoCola *&frente, NodoCola *&fin) {
+  string nombre;
+  string prioridad;
+  cout << "Ingrese el nombre de la nueva tarea: ";
+  cin >> nombre;
+  do {
+    cout << "Ingrese la prioridad de la nueva tarea: (baja, media o alta) ";
+    cin >> prioridad;
+  } while (prioridad != "baja" && prioridad != "media" && prioridad != "alta");
+  cout << "Tarea " << nombre << " añadida a la cola (encolado)" << endl;
+  cout << "==========================================" << endl;
+  cout << "Id: " << ID << endl;
+  cout << "Nombre: " << nombre << endl;
+  cout << "Prioridad: " << prioridad << endl;
+
+  Tarea nuevaTarea = Tarea();
+  nuevaTarea.nombre = nombre;
+  nuevaTarea.prioridad = prioridad;
+  NodoCola *nuevoNodo = new NodoCola(nuevaTarea);
+
+  if (frente == NULL) {
+    frente = fin;
+  } else {
+    fin->siguiente = nuevoNodo;
+    fin = nuevoNodo;
+  }
+}
+
+void desencolar(NodoCola *&frente, NodoCola *&fin) {
+  if (frente == NULL) {
+    cout << "No hay tareas en la cola, no se puede eliminar\n" << endl;
+    return;
+  }
+  NodoCola *temp = frente;
+
+  // asignando tarea a desarollador
+  NodoTareaAsignada *nuevoNodoLista = new NodoTareaAsignada(temp->tarea);
+  if (tareasAsignadas == NULL) {
+    tareasAsignadas = nuevoNodoLista;
+  } else {
+    NodoTareaAsignada *temporal = tareasAsignadas;
+    while (temporal->siguiente != NULL) {
+      temporal = temporal->siguiente;
+    }
+    temporal->siguiente = nuevoNodoLista;
+  }
+  //
+  frente = frente->siguiente;
+  cout << "Tarea " << temp->tarea.nombre << " eliminada (desencolada)" << endl;
+
+  if (frente == NULL) {
+    fin = NULL;
   };
+  delete temp;
+}
+
+void mostrarCola(NodoCola *frente) {
+  if (frente == NULL) {
+    cout << "No hay tareas en la cola\n" << endl;
+    return;
+  }
+
+  cout << "\n====Tareas en la cola====\n" << endl;
+  NodoCola *temp = frente;
+
+  while (temp != NULL) {
+    cout << "==================================" << endl;
+    cout << "Id: " << temp->tarea.id << endl;
+    cout << "Nombre: " << temp->tarea.nombre << endl;
+    cout << "Prioridad: " << temp->tarea.prioridad << endl;
+    cout << "==================================" << endl;
+    temp = temp->siguiente;
+  }
+}
+
+// PILAS -------------------------------------------------------------
+
+void apilarTarea(NodoPila *&pilaTope) {
+
+  NodoTareaAsignada *temp = tareasAsignadas;
+  if (temp == NULL) {
+    cout << "No hay tareas asignadas (aun no se ha desencolado)" << endl;
+    return;
+  } else {
+    cout << "====Tareas en ====" << endl;
+    while (temp != NULL) {
+      cout << "=========================================" << endl;
+      cout << "Id: " << temp->tarea.id << endl;
+      cout << "Nombre: " << temp->tarea.nombre << endl;
+      cout << "Prioridad: " << temp->tarea.prioridad << endl;
+      cout << "=========================================" << endl;
+      temp = temp->siguiente;
+    }
+    int id;
+    do {
+      cout << "Ingrese el id de la tarea que desee mover a revision: ";
+      cin >> id;
+    } while (id < 0);
+
+    // nodo anterior, para poder eliminar el nodo de la lista de tareas
+    // asignadas
+    NodoTareaAsignada *anterior = NULL;
+
+    temp = tareasAsignadas;
+    while (temp != NULL) {
+      if (temp->tarea.id == id) {
+        // codigo de apilacion
+        NodoPila *nuevoNodo = new NodoPila(temp->tarea);
+        nuevoNodo->siguiente = pilaTope;
+        pilaTope = nuevoNodo;
+        cout << "Tarea " << temp->tarea.nombre << " movida a revision(pila)"
+             << endl;
+
+        // quitando tarea de la lista de tareas asignadas
+        if (anterior == NULL)
+          tareasAsignadas = temp->siguiente;
+        else
+          anterior->siguiente = temp->siguiente;
+        delete temp;
+        return;
+
+      } else {
+        anterior = temp;
+        temp = temp->siguiente;
+      };
+    };
+    cout << "Tarea no encontrada";
+  };
+};
+
+void desapilarTarea(NodoPila *&pilaTope) {
+  if (pilaTope == NULL) {
+    cout << "la pila esta vacia, no hay tareas para desapilar" << endl;
+  } else {
+    cout << "Desapilando y completando tarea============================"
+         << endl;
+    NodoPila *temp = pilaTope;
+    pilaTope = pilaTope->siguiente;
+
+    textoTareasCompletadas += "Id: " + to_string(temp->tarea.id) +
+                              "\n Nombre: " + temp->tarea.nombre +
+                              "\n Prioridad: " + temp->tarea.prioridad +
+                              "=====================================\n";
+
+    delete temp;
+    cout << "Tarea " << temp->tarea.nombre << " desapilada y completada"
+         << endl;
+  };
+};
+
+void mostrarTareasCompletadas(NodoPila *pilaTope) {
+
+  cout << "==================Tareas en revision=========================\n";
+  if (pilaTope == NULL) {
+    cout << "No hay tareas en revision" << endl;
+  };
+  NodoPila *temp = pilaTope;
+  while (temp != NULL) {
+    cout << "=========================================" << endl;
+    cout << "Id: " << temp->tarea.id << endl;
+    cout << "Nombre: " << temp->tarea.nombre << endl;
+    cout << "Prioridad: " << temp->tarea.prioridad << endl;
+    cout << "=========================================" << endl;
+    temp = temp->siguiente;
+  };
+  cout << "\n==================Tareas completadas=========================\n";
+  cout << textoTareasCompletadas;
 };
 
 int main() {
-  int op;
-  Nodo *listaDeProcesos = NULL;
+  // Inicializando la lista, cola y pila.
+  NodoLista *inicio = NULL;
+  NodoCola *frente = NULL;
+  NodoCola *fin = NULL;
+  NodoPila *pilaTope = NULL;
 
+  int opcionPrincipal, opcionSub;
   do {
-    cout << "-----Administrador de archivos----- " << endl;
-    cout << "1. Añadir nuevo proceso";
-    cout << "2. Eliminar proceso";
-    cout << "3. Buscar proceso";
-    cout << "4. Modificar prioridad de proceso";
-    cin >> op;
+    cout << "-------------------------------\n";
+    cout << "        MENÚ PRINCIPAL         \n";
+    cout << "-------------------------------\n";
+    cout << "1. Gestión de Tareas Pendientes\n";
+    cout << "2. Gestión de Tareas Completadas\n";
+    cout << "3. Gestión de Tareas Prioritarias\n";
+    cout << "4. Buscar Tareas\n";
+    cout << "5. Salir\n";
+    cout << "-------------------------------\n";
+    cout << "Seleccione una opción (1-5): ";
+    cin >> opcionPrincipal;
 
-    switch (op) {
+    switch (opcionPrincipal) {
     case 1:
-      insertarNuevoProceso(listaDeProcesos);
+      do {
+        cout << "\n-------------------------------\n";
+        cout << "   GESTIÓN DE TAREAS PENDIENTES\n";
+        cout << "-------------------------------\n";
+        cout << "1. Añadir tarea pendiente a la cola\n";
+        cout << "2. Asignar tarea (desencolar)\n";
+        cout << "3. Ver tareas pendientes en la cola\n";
+        cout << "4. Regresar al Menú Principal\n";
+        cout << "-------------------------------\n";
+        cout << "Seleccione una opción (1-4): ";
+        cin >> opcionSub;
+
+        switch (opcionSub) {
+        case 1:
+          encolar(frente, fin);
+          break;
+        case 2:
+          desencolar(frente, fin);
+          break;
+        case 3:
+          mostrarCola(frente);
+          break;
+        case 4:
+          cout << "Regresando al Menú Principal...\n";
+          break;
+        default:
+          cout << "Opción inválida.\n";
+        }
+      } while (opcionSub != 4);
       break;
+
     case 2:
-      eliminarProceso(listaDeProcesos);
+      do {
+        cout << "\n-------------------------------\n";
+        cout << "   GESTIÓN DE TAREAS COMPLETADAS\n";
+        cout << "-------------------------------\n";
+        cout << "1. Mover tarea a revisión (apilar)\n";
+        cout << "2. Revisar tarea (desapilar)\n";
+        cout << "3. Ver tareas completadas\n";
+        cout << "4. Regresar al Menú Principal\n";
+        cout << "-------------------------------\n";
+        cout << "Seleccione una opción (1-4): ";
+        cin >> opcionSub;
+
+        switch (opcionSub) {
+        case 1:
+          apilarTarea(pilaTope);
+          break;
+        case 2:
+          desapilarTarea(pilaTope);
+          break;
+        case 3:
+          mostrarTareasCompletadas(pilaTope);
+          break;
+        case 4:
+          cout << "Regresando al Menú Principal...\n";
+          break;
+        default:
+          cout << "Opción inválida.\n";
+        }
+      } while (opcionSub != 4);
       break;
+
     case 3:
-      buscarProceso(listaDeProcesos);
+      do {
+        cout << "\n-------------------------------\n";
+        cout << "   GESTIÓN DE TAREAS PRIORITARIAS\n";
+        cout << "-------------------------------\n";
+        cout << "1. Añadir tarea prioritaria\n";
+        cout << "2. Ordenar tareas prioritarias\n";
+        cout << "3. Ver tareas prioritarias\n";
+        cout << "4. Regresar al Menú Principal\n";
+        cout << "-------------------------------\n";
+        cout << "Seleccione una opción (1-4): ";
+        cin >> opcionSub;
+
+        switch (opcionSub) {
+        case 1:
+          insertarNuevaTarea(inicio);
+          break;
+        case 2:
+          ordenarTareasPrioritarias(inicio);
+          break;
+        case 3:
+          mostrarTareas(inicio);
+          break;
+        case 4:
+          cout << "Regresando al Menú Principal...\n";
+          break;
+        default:
+          cout << "Opción inválida.\n";
+        }
+      } while (opcionSub != 4);
       break;
+
     case 4:
-      modificarPrioridadProceso(listaDeProcesos, 1);
+      do {
+        cout << "\n-------------------------------\n";
+        cout << "          BUSCAR TAREAS         \n";
+        cout << "-------------------------------\n";
+        cout << "1. Buscar tarea por ID\n";
+        cout << "2. Buscar tarea por prioridad\n";
+        cout << "3. Regresar al Menú Principal\n";
+        cout << "-------------------------------\n";
+        cout << "Seleccione una opción (1-3): ";
+        cin >> opcionSub;
+
+        switch (opcionSub) {
+        case 1:
+          buscarTarea(inicio, "id");
+          break;
+        case 2:
+          buscarTarea(inicio, "prioridad");
+          break;
+        case 3:
+          cout << "Regresando al Menú Principal...\n";
+          break;
+        default:
+          cout << "Opción inválida.\n";
+        }
+      } while (opcionSub != 3);
       break;
+
+    case 5:
+      cout << "\n-------------------------------\n";
+      cout << " ¡Regresa pronto! \n";
+      cout << "-------------------------------\n";
+      break;
+
     default:
-      cout << "Opcion invalida" << endl;
-      break;
+      cout << "Opción inválida.\n";
     }
-  } while (op != 4);
-};
+
+  } while (opcionPrincipal != 5);
+
+  return 0;
+}
