@@ -263,7 +263,7 @@ void apilarTarea(NodoPila *&pilaTope) {
     cout << "No hay tareas asignadas (aun no se ha desencolado)" << endl;
     return;
   } else {
-    cout << "====Tareas en ====" << endl;
+    cout << "===== Tareas en =====" << endl;
     while (temp != NULL) {
       cout << "=========================================" << endl;
       cout << "Id: " << temp->tarea.id << endl;
